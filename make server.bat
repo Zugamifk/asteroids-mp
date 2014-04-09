@@ -1,3 +1,3 @@
-cd C:\Users\Limez\Dropbox\Code\C\OpenGL\"Asteroid 2 - mp"\server
+cd C:\Users\Limez\Dropbox\Code\C\OpenGL\"asteroids-mp"\server
 make
 pause

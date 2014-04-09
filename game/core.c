@@ -419,19 +419,19 @@ void checkCollisions(void) {
 
 	// Ship->asteroid collisions
 	int si;
-	object ship;
+	object *ship;
 	for ( si = 0; si < MAXSHIPS; si++ ) {
-		ship = ships[si];
+		ship = ships+si;
 
-		if ( !(ship.state & ( SHIP_DED | SHIP_INACTIVE)) ) {
+		if ( !(ship->state & ( SHIP_DED | SHIP_INACTIVE)) ) {
 			
 			int si;
 			// Check eack vertex of the ship for a collision
-			for (si=0; si<ship.size; si++) {
+			for (si=0; si<ship->size; si++) {
 
 				int a;
 				// Get world coordinate of ship vertex
-				vector sv = localToWorld(ship.verts+si, &ship);
+				vector sv = localToWorld(ship->verts+si, ship);
 
 				// Check all asteroids for collision
 				for (a = 0; a < MAXASTEROIDS; a++) {
@@ -446,10 +446,10 @@ void checkCollisions(void) {
 
 						// Kill asteroid and ship, display lose message
 						killAsteroid(asteroids+a);
-						initGib(shipGibs+si*ship.size, &ship, GIB_ACTIVE);
+						initGib(shipGibs+si*ship->size, ship, GIB_ACTIVE);
 						initGib(asteroidGibs[a], asteroids+a, GIB_ACTIVE);
 						initMessage();
-						ship.state += SHIP_DED;				
+						ship->state += SHIP_DED;				
 						break;			
 					}		
 				}
@@ -626,12 +626,13 @@ void update() {
 	}	
 
 	// shoot lasers
+	object *shipi;
 	for (i = 0; i < MAXSHIPS; i++) {
-		ship = ships[i];
-		if (ship.state & SHIP_SHOOTING && !(ship.state & (SHIP_DED | SHIP_INACTIVE))) {
-			initLazor(LAZORZ+shotIndex, &ship);
+		shipi = ships+i;
+		if (shipi->state & SHIP_SHOOTING && !(shipi->state & (SHIP_DED | SHIP_INACTIVE))) {
+			initLazor(LAZORZ+shotIndex, shipi);
 			shotIndex = (shotIndex + 1) % MAXSHOTS;
-			ship.state -= SHIP_SHOOTING;
+			shipi->state -= SHIP_SHOOTING;
 		}
 	}
 
