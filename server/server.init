@@ -1,0 +1,5 @@
+# Client id
+ID = "Server Hooba"
+
+# listen port
+LISTEN = 8705

@@ -1,0 +1,9 @@
+# Client id
+ID = "Client Zaboo"
+
+# listen port
+LISTEN = 3133
+
+# Server address
+# SEND = 142.177.137.180:8705
+SEND = 127.0.0.1:8705
