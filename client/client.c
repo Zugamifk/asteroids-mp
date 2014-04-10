@@ -57,7 +57,7 @@ void *client_loop(void *p) {
 		if ( ap != NULL ) break;
 		usleep(500000);
 	}
-	send( sock_server, (void *)"Hi!", 4, 0);
+	send( sock_server, (void *)ic.id, strlen(ic.id)+1, 0);
 	
 	fprintf(stderr, "Client failed to connect to server.\n");
 	closesocket( sock_server );

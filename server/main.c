@@ -30,6 +30,7 @@ void *session_loop(void *p) {
 
 	char msg[1024];
 	int len;
+	int shipid;
 	data_pipe *dp = (data_pipe *)p;
 	
 	SOCKET sock_client;
@@ -37,11 +38,14 @@ void *session_loop(void *p) {
 	data_pipe_get( dp, &msg, &len);
 	sock_client = *(SOCKET *)msg;
 	
+	data_pipe_get( dp, &shipid, NULL);
+	
 	len = recv(sock_client, msg, 1024, 0);
 	msg[len] = '\0';
 	printf("%s\n", msg);	
 
 	//start session
+	
 
 	pthread_exit(NULL);
 	return NULL;
@@ -156,11 +160,10 @@ int main(void) {
 	data_pipe listen_pipe;
 	data_pipe client_pipes[MAX_CLIENTS];
 
-	int numclients = 0;
 	int quit = 0;
 	char msg[1024];
 	int len = 0;
-	
+	int numclients = 0;
 	
 	// load init file for session info
 	memset(&ic, 0, sizeof ic);
@@ -194,6 +197,7 @@ int main(void) {
 	
 	// start game
 	init();
+	myship->state = SHIP_INACTIVE;
 	
 	// main loop
 	while(!quit) {
@@ -207,7 +211,9 @@ int main(void) {
 		update();
 		
 		// poll listen pipe
-		if (data_pipe_geta( &listen_pipe, (void *)msg, &len) == 1) {
+		if (numclients < MAX_CLIENTS &&
+			data_pipe_geta( &listen_pipe, (void *)msg, &len) == 1) {
+			
 			newclient = *((SOCKET *)msg);
 			if (newclient < 0) {
 				printf("listen thread error: %s\n", gai_strerror(newclient));
@@ -219,7 +225,9 @@ int main(void) {
 
 					data_pipe_put( &client_pipes[numclients], (void *)&newclient, sizeof newclient );
 					pthread_create(&client_td[numclients], NULL, session_loop, (void *)&client_pipes[numclients]);
+					data_pipe_put( &client_pipes[numclients], (void *)&numclients, sizeof numclients );
 					data_pipe_sync( &client_pipes[numclients] );
+					
 					numclients++;
 				
 				}
